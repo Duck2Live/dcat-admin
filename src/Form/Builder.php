@@ -722,7 +722,11 @@ class Builder implements FieldsCollection
                 );
             }
 
-            $content = $this->layout->build();
+            // 2.2.3 behaviour: always append the hidden fields (_method, _previous_, ...). Block-layout
+            // forms never render form.container, so without this they lost _method=PUT and edits 405'd.
+            $content = $this->layout->build(
+                $this->renderHiddenFields()
+            );
         }
 
         return "{$open}{$content}{$this->close()}";

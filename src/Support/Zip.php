@@ -72,7 +72,7 @@ class Zip extends ZipArchive
 
         $mask = $options['mask'];
 
-        if (mkdir($destination, $mask, true) || is_dir($destination)) {
+        if (is_dir($destination) || mkdir($destination, $mask, true)) {
             $zip = new ZipArchive;
             if ($zip->open($source) === true) {
                 $zip->extractTo($destination);

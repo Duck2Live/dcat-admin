@@ -24,7 +24,7 @@ class Equal extends Filter
     {
         $this->placeholder($placeholder ?: $this->trans('search'));
 
-        $this->class = uniqid('column-filter-', true);
+        $this->class = uniqid('column-filter-');
     }
 
     /**

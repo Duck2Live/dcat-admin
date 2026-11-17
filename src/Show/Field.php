@@ -408,13 +408,25 @@ HTML;
 
         return $this->unescape()->as(function ($value) use ($field) {
             $content = is_string($value) ? json_decode($value, true) : $value;
-            if (is_array($content)) {
-                array_walk($content, function (&$v, $k) {
-                    $v = htmlspecialchars($v, ENT_QUOTES | ENT_HTML5);
-                });
-            } else {
-                $content = htmlspecialchars($content, ENT_QUOTES | ENT_HTML5);
-            }
+            // Escape every string (keys and values, at any depth) so stored JSON cannot inject HTML,
+            // while keeping numbers/booleans/null and nested structures intact (the previous
+            // non-recursive htmlspecialchars() threw a TypeError on nested arrays).
+            $escape = function ($item) use (&$escape) {
+                if (is_object($item)) {
+                    $item = json_decode(json_encode($item), true);
+                }
+                if (is_array($item)) {
+                    $escaped = [];
+                    foreach ($item as $key => $value) {
+                        $escaped[is_string($key) ? htmlspecialchars($key, ENT_QUOTES | ENT_HTML5) : $key] = $escape($value);
+                    }
+
+                    return $escaped;
+                }
+
+                return is_string($item) ? htmlspecialchars($item, ENT_QUOTES | ENT_HTML5) : $item;
+            };
+            $content = $escape($content);
             $field->wrap(false);
 
             return Dump::make($content);

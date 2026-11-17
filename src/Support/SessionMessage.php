@@ -88,6 +88,22 @@ final class SessionMessage implements \JsonSerializable
             );
         }
 
+        // 2.2.3 helpers (admin_info/admin_success/admin_error/admin_toastr) and apps flashed
+        // Illuminate\Support\MessageBag instances (alerts: title/message; toastr: type/message/options).
+        if ($value instanceof \Illuminate\Support\MessageBag) {
+            $title = $value->has('title') ? $value->first('title') : $value->first('type');
+
+            return new self((string) $title, (string) $value->first('message'), (array) $value->get('options'));
+        }
+
+        // A MessageBag that was serialized to a plain array (e.g. JSON session serialization).
+        if (is_array($value) && (array_key_exists('title', $value) || array_key_exists('message', $value) || array_key_exists('type', $value))) {
+            $first = fn ($v) => is_array($v) ? (string) (reset($v) ?: '') : (is_scalar($v) ? (string) $v : '');
+            $title = array_key_exists('title', $value) ? $first($value['title']) : $first($value['type'] ?? '');
+
+            return new self($title, $first($value['message'] ?? ''), is_array($value['options'] ?? null) ? $value['options'] : []);
+        }
+
         return null;
     }
 }

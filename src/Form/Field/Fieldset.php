@@ -10,7 +10,7 @@ class Fieldset
 
     public function __construct()
     {
-        $this->name = uniqid('fieldset-', true);
+        $this->name = uniqid('fieldset-');
     }
 
     public function start($title)

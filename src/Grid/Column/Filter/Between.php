@@ -18,8 +18,8 @@ class Between extends Filter
     public function __construct()
     {
         $this->class = [
-            'start' => uniqid('column-filter-start-', true),
-            'end'   => uniqid('column-filter-end-', true),
+            'start' => uniqid('column-filter-start-'),
+            'end'   => uniqid('column-filter-end-'),
         ];
     }
 
