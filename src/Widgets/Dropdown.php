@@ -219,7 +219,9 @@ class Dropdown extends Widget
             $v = $builder->call($this, $v, $k);
         }
 
-        $v = str_starts_with($v, '</a>') ? $v : "<a href='javascript:void(0)'>$v</a>";
+        // Keep items that already contain a link (2.2.3: `mb_strpos($v, '</a>') ? ...`); str_starts_with()
+        // wrapped every item, nesting <a> inside <a> in dropdown action menus.
+        $v = mb_strpos($v, '</a>') ? $v : "<a href='javascript:void(0)'>$v</a>";
         $v = "<li class='dropdown-item'>$v</li>";
 
         if ($this->divider) {

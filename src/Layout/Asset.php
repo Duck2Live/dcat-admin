@@ -366,7 +366,11 @@ class Asset
         }
 
         return array_filter($files, function ($file) {
-            return !str_starts_with($file, '{');
+            // Drop paths that still contain an unreplaced placeholder such as "{lang}" (2.2.3 behaviour:
+            // `! mb_strpos($file, '{')`); str_starts_with() let "@admin/.../i18n/{lang}.js" through.
+            $position = mb_strpos($file, '{');
+
+            return $position === false || $position === 0;
         });
     }
 
